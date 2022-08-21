@@ -16,6 +16,11 @@ def get_files(path):
             abort(404)
     except FileNotFoundError:
         abort(404)
+
+@app.route('/auth', methods=['GET'])
+def auth():
+    code = request.args.get('code')
+    return "Поздравляем, ваши данные занесены в базу ЦРУ!"
   
 if __name__ == "__main__":
    app.run(debug=True, host='0.0.0.0')
