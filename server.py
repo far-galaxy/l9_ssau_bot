@@ -5,6 +5,10 @@ app = Flask(__name__)
 def index():
    return send_file("index.html")
 
+@app.route("/lk") 
+def lk():
+   return send_file("joke.html")
+
 @app.route('/<path:path>', methods=['GET'])
 def get_files(path):
     try:
@@ -20,7 +24,8 @@ def get_files(path):
 @app.route('/auth', methods=['GET'])
 def auth():
     code = request.args.get('code')
-    return "Поздравляем, ваши данные занесены в базу ЦРУ!"
+    return redirect('/lk')
+   
   
 if __name__ == "__main__":
    app.run(debug=True, host='0.0.0.0')
