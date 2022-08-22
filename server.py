@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from flask import *
 from vkbot import *
 from mysql.connector import connect
 import requests
+from ast import literal_eval
 
 app = Flask(__name__)
 
@@ -17,6 +19,7 @@ database = connect( host = "localhost",
                     password = sql_pass)
 
 cursor = database.cursor()
+cursor.execute("CREATE DATABASE IF NOT EXISTS l9users")
 cursor.execute("USE l9users")
 
 ssau_users = """CREATE TABLE IF NOT EXISTS ssau_users (
@@ -53,6 +56,7 @@ def auth():
     code = request.args.get('code')
     req['code'] = code
     data = requests.get("https://oauth.vk.com/access_token", params=req)
+    print(data.encoding)
     if data.status_code == 200:
         data = data.json()
         user_req = {}
@@ -61,8 +65,11 @@ def auth():
         user_req['access_token'] = data['access_token']
         user_req['fields'] = 'photo_big'
         user_data = requests.get("https://api.vk.com/method/users.get", params=user_req)
+        print(user_data.encoding)
         if user_data.status_code == 200:
-            user_data = user_data.json()['response'][0]
+            #user_data = user_data.json()['response'][0]
+            d = user_data.content.decode()
+            user_data = literal_eval(d)['response'][0]
 
             user = [''] * 4
             user[0] = user_data['id']
@@ -72,7 +79,7 @@ def auth():
             print(user)
             
             user_query = """
-            INSERT INTO ssau_users
+            INSERT IGNORE INTO ssau_users
             (vkId, userName, userSurname, userPhotoUrl)
             VALUES ( %s, %s, %s, %s)
             """
