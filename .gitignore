@@ -2,3 +2,4 @@ __pycache__
 l9env
 settings
 gunicorn.sock
+logs

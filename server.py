@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 from flask import *
 from vkbot import *
-from mysql.connector import connect
+from sql import *
+from logger import *
 import requests
 from ast import literal_eval
+
+init_logger()
+logger.info('Logger Ready. Initializating...')
 
 app = Flask(__name__)
 
@@ -14,22 +18,7 @@ req['redirect_uri'] = VKBot.check_file("settings/redirect_uri")
 
 sql_pass = VKBot.check_file("settings/sql_pass")
 
-database = connect( host = "localhost",
-                    user = 'root',
-                    password = sql_pass)
-
-cursor = database.cursor()
-cursor.execute("CREATE DATABASE IF NOT EXISTS l9users")
-cursor.execute("USE l9users")
-
-ssau_users = """CREATE TABLE IF NOT EXISTS ssau_users (
-    vkId INTEGER PRIMARY KEY,
-    userName VARCHAR(10),
-    userSurname VARCHAR(10),
-    userPhotoUrl TEXT
-    );"""
-
-cursor.execute(ssau_users)
+db = Database("localhost","root",sql_pass)
 
 @app.route("/") 
 def index():
@@ -56,7 +45,7 @@ def auth():
     code = request.args.get('code')
     req['code'] = code
     data = requests.get("https://oauth.vk.com/access_token", params=req)
-    print(data.encoding)
+    logger.info(data.content)
     if data.status_code == 200:
         data = data.json()
         user_req = {}
@@ -65,27 +54,26 @@ def auth():
         user_req['access_token'] = data['access_token']
         user_req['fields'] = 'photo_big'
         user_data = requests.get("https://api.vk.com/method/users.get", params=user_req)
-        print(user_data.encoding)
+        logger.info(user_data.content)
         if user_data.status_code == 200:
-            #user_data = user_data.json()['response'][0]
             d = user_data.content.decode()
             user_data = literal_eval(d)['response'][0]
 
-            user = [''] * 4
-            user[0] = user_data['id']
-            user[1] = user_data['first_name']
-            user[2] = user_data['last_name']
-            user[3] = user_data['photo_big']
-            print(user)
+            user = [''] * 5
+            user[0] = db.newID()
+            user[1] = user_data['id']
+            user[2] = user_data['first_name']
+            user[3] = user_data['last_name']
+            user[4] = user_data['photo_big']
             
             user_query = """
-            INSERT IGNORE INTO ssau_users
-            (vkId, userName, userSurname, userPhotoUrl)
-            VALUES ( %s, %s, %s, %s)
+            INSERT IGNORE INTO l9_users
+            (l9Id, vkId, userName, userSurname, userPhotoUrl)
+            VALUES (%s, %s, %s, %s, %s)
             """
 
-            cursor.execute(user_query, tuple(user))
-            database.commit()
+            db.cursor.execute(user_query, user)
+            db.database.commit()
             return redirect("/lk")
     return "Ошибка"
 
