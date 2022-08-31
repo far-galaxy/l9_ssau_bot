@@ -60,7 +60,7 @@ def auth():
     
                 db.cursor.execute(user_query, user)
                 db.database.commit()         
-                return redirect("/lk")
+                return redirect(f"/lk?l9Id={user[0]}")
             else:
                 return user.content
         else:    
