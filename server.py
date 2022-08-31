@@ -42,7 +42,7 @@ def get_files(path):
 
 @app.route('/auth', methods=['GET'])
 def auth():
-    if request.get_data(as_text=True) == "vk":
+    if request.args.get('state') == "vk":
         code = request.args.get('code')
         req['code'] = code
         data = requests.get("https://oauth.vk.com/access_token", params=req)
