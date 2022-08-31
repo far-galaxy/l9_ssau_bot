@@ -22,7 +22,7 @@ class Database():
 		self.cursor.execute(users_table)		
 		
 	def newID(self):
-		l9ID = random.randint(1,10^6)
+		l9ID = random.randint(100000000,999999999)
 		
 		check_id = """SELECT l9Id FROM l9_users
 		WHERE l9Id = %s"""
