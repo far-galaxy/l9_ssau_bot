@@ -68,6 +68,18 @@ def auth():
         
     else:
         abort(501)
+        
+@app.route('/api/lk/users.get', methods=['GET'])
+def usersGet():
+    uid = request.args.get('l9Id')
+    query = """SELECT * FROM l9_users WHERE l9Id = %s"""
+    db.cursor.execute(query, [uid])
+    users = []
+    for user in db.cursor.fetchall():
+        print(user)
+        keys = ['l9Id','vkId','userName','userSurname','userPhotoUrl']
+        users.append(dict(zip(keys, user)))
+    return json.dumps(users, sort_keys = False)
 
 def getUser(data):
     user_req = {}

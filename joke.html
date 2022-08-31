@@ -1,26 +1,64 @@
 <html>
-	<title>l9labs</title>
 
-	<style>
-		body
-		{
-			background: black;
-			background-size: cover;
-			background-position: center;
-			background-repeat: no-repeat;
-			background-attachment: fixed;
-			background-image: url(media/bg.png);
-		}
+<head>
+    <title>l9labs</title>
+    <meta name='viewport' content='width=device-width,initial-scale=1' />
+    <meta name="mobile-web-app-capable" content="yes">
+</head>
 
-		h1, h2
-		{
-			text-align: center;
-			color: #fff;
-		}
-	</style>
+<style>
+    body {
+        background: black;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-image: url(media/bg.png);
+    }
 
-	<body>
-		<h1>Авторизация прошла успешно!</h1>
-		<h2>Поздравляем, ваши данные занесены в базу ЦРУ!</h2>
-	</body>
+    h1,
+    h2 {
+        text-align: center;
+        color: #fff;
+    }
+
+    div {
+        display: flex;
+        background-color: aquamarine;
+        margin: 10px;
+        padding: 10px;
+        align-items: center;
+        justify-content: space-around;
+        border-radius: 2rem;
+    }
+
+    div img {
+        width: 8rem;
+        border-radius: 4rem;
+    }
+
+</style>
+
+<body>
+    <h1>Авторизация прошла успешно!</h1>
+    <h2>Поздравляем, ваши данные занесены в базу ЦРУ!</h2>
+</body>
+    
+<script>
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const id = urlParams.get('l9Id');
+    const response = fetch(`api/lk/users.get?l9Id=${id}`)
+    .then(response => response.json())
+    .then(user => {
+        user.map(data = ({l9Id, userName, userSurname, userPhotoUrl}) => {
+            const e = document.createElement('div');
+            e.innerHTML = `
+            <h3>${userName} ${userSurname}</h3>
+            <img src=${userPhotoUrl} alt="">`;
+            document.body.appendChild(e);
+        });
+    }); 
+</script>
+
 </html>
