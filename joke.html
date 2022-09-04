@@ -4,6 +4,8 @@
     <title>l9labs</title>
     <meta name='viewport' content='width=device-width,initial-scale=1' />
     <meta name="mobile-web-app-capable" content="yes">
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
 </head>
 
 <style>
@@ -45,9 +47,7 @@
 </body>
     
 <script>
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const id = urlParams.get('l9Id');
+    const id = $.cookie("userID");
     const response = fetch(`api/lk/users.get?l9Id=${id}`)
     .then(response => response.json())
     .then(user => {
