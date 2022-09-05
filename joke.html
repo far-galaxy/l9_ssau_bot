@@ -47,8 +47,8 @@
 </body>
     
 <script>
-    const id = $.cookie("userID");
-    const response = fetch(`api/lk/users.get?l9Id=${id}`)
+    //const id = $.cookie("userID");
+    const response = fetch(`api/lk/users.get`)
     .then(response => response.json())
     .then(user => {
         user.map(data = ({l9Id, userName, userSurname, userPhotoUrl}) => {

@@ -67,6 +67,16 @@ class Database():
 		query = "SELECT " + (', '.join(columns) if columns != None else "*")
 		query += f" FROM {name} WHERE {condition};"
 		return self.execute(query)
+	
+	def addRow(self, name, row):
+		query = f"ALTER TABLE {name}"
+		query += f" ADD {' '.join(row)};"
+		self.execute(query)	
+		
+	def update(self, name, condition, new):
+		query = f"UPDATE {name}"
+		query += f" SET {new} WHERE {condition};"
+		self.execute(query, commit = True)		
 		
 	def newID(self, name, id_name):
 		"""Generate random 9-digits ID
@@ -99,7 +109,8 @@ class L9LK():
 		["vkId", "INTEGER"],
 		["userName", "TEXT"],
 		["userSurname", "TEXT"],
-		["userPhotoUrl", "TEXT"]
+		["userPhotoUrl", "TEXT"],
+		["sessionToken", "TEXT"],
 		])
 		
 	def initVkUser(self, data):

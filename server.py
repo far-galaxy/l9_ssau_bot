@@ -3,6 +3,7 @@ from flask import *
 from logger import *
 from vk import *
 from sql import *
+from utils import *
 
 init_logger()
 
@@ -11,13 +12,18 @@ app = Flask(__name__)
 sql_pass = checkFile("settings/sql_pass")
 db = L9LK(sql_pass)
 
+md5_key = checkFile("settings/md5_key")
+
 @app.route("/") 
 def index():
 	return send_file("index.html")
 
 @app.route("/lk") 
 def lk():
-	return send_file("joke.html")
+	if "session_token" in request.cookies:
+		return send_file("joke.html")
+	else:
+		return redirect("/")
 
 @app.route('/<path:path>', methods=['GET'])
 def get_files(path):
@@ -39,11 +45,17 @@ def auth():
 		if success:
 			success, user_data = getUserInformation(token)
 			if success:
-				logger.info(user_data)
+				logger.info(user_data)	
 				user_id = str(db.initVkUser(user_data))
 				
+				session_token = hashMD5(md5_key + user_id)
+				
+				db.db.update("l9_users", 
+							 f"l9Id = {user_id}", 
+							 f"sessionToken = '{session_token}'")
+				
 				resp = make_response(redirect("/lk"))
-				resp.set_cookie('userID', user_id)
+				resp.set_cookie('session_token', session_token)
 				return resp
 			else:
 				logger.error(user_data)
@@ -56,12 +68,17 @@ def auth():
 		
 @app.route('/api/lk/users.get', methods=['GET'])
 def usersGet():
-	uid = request.args.get('l9Id')
-	users = []
-	for user in db.db.get("l9_users", f"l9Id = {uid}").fetchall():
-		keys = ['l9Id','vkId','userName','userSurname','userPhotoUrl']
-		users.append(dict(zip(keys, user)))
-	return json.dumps(users, sort_keys = False)
+	if ("session_token" in request.cookies):
+		uid = db.db.get("l9_users", 
+						f"sessionToken = '{request.cookies['session_token']}'",
+						["l9Id"]).fetchall()[0][0]
+		users = []
+		for user in db.db.get("l9_users", f"l9Id = {uid}").fetchall():
+			keys = ['l9Id','vkId','userName','userSurname','userPhotoUrl']
+			users.append(dict(zip(keys, user)))
+		return json.dumps(users, sort_keys = False)
+	else:
+		abort(401)
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0')

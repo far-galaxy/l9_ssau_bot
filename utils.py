@@ -1,4 +1,5 @@
 import os
+from hashlib import md5
 
 def checkFile(file):
 	"""Checking and loading information from file.
@@ -27,3 +28,6 @@ def checkFile(file):
 		file.write(info)
 		file.close()
 	return info
+
+def hashMD5(string):
+	return md5(string.encode('utf-8')).hexdigest()
