@@ -31,6 +31,7 @@ def get_files(path):
 		if (path.find("js") != -1 or 
 		    path.find("media") != -1 or
 			path.find("robots.txt") != -1 or
+			path.find("favicon.ico") != -1 or
 			path.find(".html") != -1):
 			return send_file(path)
 		else:
