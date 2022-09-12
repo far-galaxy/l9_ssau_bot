@@ -18,6 +18,18 @@ md5_key = checkFile("settings/md5_key")
 def index():
 	return send_file("index.html")
 
+@app.route("/stuff") 
+def stuff():
+	return send_file("stuff/index.html")
+
+@app.route('/img/<path:path>', methods=['GET'])
+def stuff_files(path):
+	print(path)
+	try:
+		return send_file("stuff/img/"+path)
+	except FileNotFoundError:
+		abort(404)
+		
 @app.route("/lk") 
 def lk():
 	if "session_token" in request.cookies:
