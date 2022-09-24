@@ -20,11 +20,14 @@ def index():
 
 @app.route("/stuff") 
 def stuff():
-	return send_file("stuff/index.html")
+	page = request.args.get('page')
+	if page == None:
+		return send_file("stuff/index.html")
+	else:
+		return send_file("stuff/video.html")
 
 @app.route('/img/<path:path>', methods=['GET'])
 def stuff_files(path):
-	print(path)
 	try:
 		return send_file("stuff/img/"+path)
 	except FileNotFoundError:
