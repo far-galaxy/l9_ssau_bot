@@ -14,6 +14,8 @@ db = L9LK(sql_pass)
 
 md5_key = checkFile("settings/md5_key")
 
+likes = int(checkFile("stuff/likes"))
+
 @app.route("/") 
 def index():
 	return send_file("index.html")
@@ -26,12 +28,23 @@ def stuff():
 	else:
 		return send_file("stuff/video.html")
 
-@app.route('/img/<path:path>', methods=['GET'])
+@app.route('/files/<path:path>', methods=['GET'])
 def stuff_files(path):
 	try:
-		return send_file("stuff/img/"+path)
+		return send_file("stuff/files/"+path)
 	except FileNotFoundError:
 		abort(404)
+
+@app.route('/stuff/likes', methods=['GET'])		
+def get_likes():
+	return str(likes)
+
+@app.route('/stuff/like', methods=['GET'])		
+def add_like():
+	global likes
+	likes += 1
+	writeFile("stuff/likes", str(likes))
+	return str(likes)
 		
 @app.route("/lk") 
 def lk():

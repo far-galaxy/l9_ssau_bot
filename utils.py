@@ -29,5 +29,16 @@ def checkFile(file):
 		file.close()
 	return info
 
+def writeFile(file, string):
+	
+	if len(file.split("/")) > 1:
+		f = file.split("/")[-1]
+		path = os.path.abspath(file.split("/")[-2])+f"/{f}.txt"
+	else:
+		path = f"{file}.txt"
+		
+	with open(path, "w", encoding="utf-8") as f:
+		f.write(string)
+
 def hashMD5(string):
 	return md5(string.encode('utf-8')).hexdigest()
