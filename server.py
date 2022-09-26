@@ -14,8 +14,6 @@ db = L9LK(sql_pass)
 
 md5_key = checkFile("settings/md5_key")
 
-likes = int(checkFile("stuff/likes"))
-
 @app.route("/") 
 def index():
 	return send_file("index.html")
@@ -37,11 +35,11 @@ def stuff_files(path):
 
 @app.route('/stuff/likes', methods=['GET'])		
 def get_likes():
-	return str(likes)
+	return str(checkFile("stuff/likes"))
 
 @app.route('/stuff/like', methods=['GET'])		
 def add_like():
-	global likes
+	likes = checkFile("stuff/likes")
 	likes += 1
 	writeFile("stuff/likes", str(likes))
 	return str(likes)
