@@ -52,14 +52,14 @@ def add_like():
 
 @app.route('/bot/subscribe', methods=['POST'])	
 def subscribe():
-	token = request.args.get('token')
+	token = request.get_json()["token"]
 	subs.append(token)
 	writeFile("settings/subs", str(subs))
 	return "ok"
 	
 @app.route('/bot/notify')#, methods=['POST'])	
 def notify():
-	key = request.args.get('key')
+	key = request.get_json()["key"]
 	if key == sql_pass:
 		head = {
 		"Authorization": f"key={push_key}",
