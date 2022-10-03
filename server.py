@@ -4,6 +4,8 @@ from logger import *
 from vk import *
 from sql import *
 from utils import *
+import requests
+from ast import literal_eval
 
 init_logger()
 
@@ -13,6 +15,9 @@ sql_pass = checkFile("settings/sql_pass")
 db = L9LK(sql_pass)
 
 md5_key = checkFile("settings/md5_key")
+push_key = checkFile("settings/push_key")
+
+subs = literal_eval(checkFile("settings/subs"))
 
 @app.route("/") 
 def index():
@@ -43,6 +48,36 @@ def add_like():
 	likes += 1
 	writeFile("stuff/likes", str(likes))
 	return str(likes)
+
+
+@app.route('/bot/subscribe', methods=['POST'])	
+def subscribe():
+	token = request.args.get('token')
+	subs.append(token)
+	return "ok"
+	
+@app.route('/bot/notify')#, methods=['POST'])	
+def notify():
+	key = request.args.get('key')
+	if key == sql_pass:
+		head = {
+		"Authorization": f"key={push_key}",
+		"Content-Type": "application/json"
+		}
+		data = {
+			"notification": {
+				"title": "l9labs",
+				"body": "Уведомление от бота",
+				"click_action": "http://l9labs.ru/"
+				},
+			"registration_ids": subs
+		}
+		req = requests.post("https://fcm.googleapis.com/fcm/send", headers=head, params=data)
+		
+		return str(req.status_code)
+	else:
+		abort(401)
+	
 		
 @app.route("/lk") 
 def lk():
