@@ -17,7 +17,7 @@ db = L9LK(sql_pass)
 md5_key = checkFile("settings/md5_key")
 push_key = checkFile("settings/push_key")
 
-subs = literal_eval(checkFile("settings/subs"))
+subs = set(literal_eval(checkFile("settings/subs")))
 
 @app.route("/") 
 def index():
@@ -50,16 +50,16 @@ def add_like():
 	return str(likes)
 
 
-@app.route('/bot/subscribe', methods=['POST'])	
+@app.route('/bot/subscribe', methods=['GET'])	
 def subscribe():
-	token = request.get_json()["token"]
-	subs.append(token)
+	token = request.args.get("token")
+	subs.add(token)
 	writeFile("settings/subs", str(subs))
 	return "ok"
 	
 @app.route('/bot/notify')#, methods=['POST'])	
 def notify():
-	key = request.get_json()["key"]
+	key = request.args.get("key")
 	if key == sql_pass:
 		head = {
 		"Authorization": f"key={push_key}",

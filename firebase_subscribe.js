@@ -51,10 +51,8 @@ function sendTokenToServer(currentToken) {
     if (!isTokenSentToServer(currentToken)) {
         console.log('Отправка токена на сервер...');
 
-        var url = '/bot/subscribe'; // адрес скрипта на сервере который сохраняет ID устройства
-        $.post(url, {
-            token: currentToken
-        });
+        var url = `/bot/subscribe?token=${currentToken}`; // адрес скрипта на сервере который сохраняет ID устройства
+        $.get(url);
 
         setTokenSentToServer(currentToken);
     } else {
