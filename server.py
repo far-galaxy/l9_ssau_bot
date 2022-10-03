@@ -17,7 +17,7 @@ db = L9LK(sql_pass)
 md5_key = checkFile("settings/md5_key")
 push_key = checkFile("settings/push_key")
 
-subs = set(literal_eval(checkFile("settings/subs")))
+subs = literal_eval(checkFile("settings/subs"))
 
 @app.route("/") 
 def index():
@@ -44,7 +44,7 @@ def get_likes():
 
 @app.route('/stuff/like', methods=['GET'])		
 def add_like():
-	likes = checkFile("stuff/likes")
+	likes = int(checkFile("stuff/likes"))
 	likes += 1
 	writeFile("stuff/likes", str(likes))
 	return str(likes)
@@ -53,8 +53,8 @@ def add_like():
 @app.route('/bot/subscribe', methods=['GET'])	
 def subscribe():
 	try:
-		token = request.args.get("token")
-		subs.add(token)
+		token = str(request.args.get("token"))
+		subs.append(token)
 		writeFile("settings/subs", str(subs))
 		return "ok"
 	except  Exception as e:
@@ -65,21 +65,26 @@ def subscribe():
 def notify():
 	key = request.args.get("key")
 	if key == sql_pass:
-		head = {
-		"Authorization": f"key={push_key}",
-		"Content-Type": "application/json"
-		}
-		data = {
-			"notification": {
-				"title": "l9labs",
-				"body": "Уведомление от бота",
-				"click_action": "http://l9labs.ru/"
-				},
-			"registration_ids": subs
-		}
-		req = requests.post("https://fcm.googleapis.com/fcm/send", headers=head, params=data)
+		try:
+			head = {
+			"Authorization": f"key={push_key}",
+			"Content-Type": "application/json"
+			}
+			data = {
+				"notification": {
+					"title": "l9labs",
+					"body": "Уведомление от бота",
+					"click_action": "http://l9labs.ru/"
+					},
+				"registration_ids": subs
+			}
+			req = requests.post("https://fcm.googleapis.com/fcm/send", headers=head, params=data)
+			
+			return str(req.status_code)
 		
-		return str(req.status_code)
+		except  Exception as e:
+			app.logger.error("Exception occurred\n", exc_info=True)
+			return abort(401)
 	else:
 		abort(401)
 	
