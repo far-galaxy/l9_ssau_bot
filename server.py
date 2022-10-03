@@ -7,9 +7,9 @@ from utils import *
 import requests
 from ast import literal_eval
 
-init_logger()
-
 app = Flask(__name__)
+
+init_logger(app.logger)
 
 sql_pass = checkFile("settings/sql_pass")
 db = L9LK(sql_pass)
@@ -52,10 +52,14 @@ def add_like():
 
 @app.route('/bot/subscribe', methods=['GET'])	
 def subscribe():
-	token = request.args.get("token")
-	subs.add(token)
-	writeFile("settings/subs", str(subs))
-	return "ok"
+	try:
+		token = request.args.get("token")
+		subs.add(token)
+		writeFile("settings/subs", str(subs))
+		return "ok"
+	except  Exception as e:
+		app.logger.error("Exception occurred\n", exc_info=True)
+		return abort(401)
 	
 @app.route('/bot/notify')#, methods=['POST'])	
 def notify():

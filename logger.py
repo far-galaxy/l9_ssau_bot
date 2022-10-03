@@ -1,9 +1,8 @@
 import os
 import logging
 import logging.handlers
-logger = logging.getLogger(__name__)
 
-def init_logger():
+def init_logger(logger):
 	if not os.path.isdir(f'logs'):
 		os.makedirs(f'logs') 
 
@@ -22,4 +21,4 @@ def init_logger():
 	c_format = logging.Formatter('%(levelname)s : %(message)s')
 	c_handler.setFormatter(c_format)
 	logger.addHandler(c_handler)
-	logger.setLevel(logging.DEBUG)
+	logger.setLevel(logging.NOTSET)
