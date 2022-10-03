@@ -54,6 +54,7 @@ def add_like():
 def subscribe():
 	token = request.args.get('token')
 	subs.append(token)
+	writeFile("settings/subs", str(subs))
 	return "ok"
 	
 @app.route('/bot/notify')#, methods=['POST'])	
